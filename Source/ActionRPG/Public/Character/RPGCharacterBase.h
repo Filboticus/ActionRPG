@@ -7,6 +7,9 @@
 #include "GameFramework/Character.h"
 #include "RPGCharacterBase.generated.h"
 
+class URPGCombatSet;
+class URPGHealthSet;
+class URPGHealthComponent;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
@@ -19,10 +22,16 @@ public:
 	// Sets default values for this character's properties
 	ARPGCharacterBase();
 
+	UFUNCTION(BlueprintCallable, Category = "RPG|Character")
+	URPGAbilitySystemComponent* GetRPGAbilitySystemComponent() const;
+	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UAttributeSet* GetAttributeSet() const; 
 
+private:
+
+	
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,6 +42,17 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RPG|Character", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URPGHealthComponent> HealthComponent;
+
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY()
+	TObjectPtr<URPGHealthSet> HealthSet;
+
+	UPROPERTY()
+	TObjectPtr<URPGCombatSet> CombatSet;
+
+	
 };

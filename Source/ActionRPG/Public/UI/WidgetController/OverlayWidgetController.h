@@ -9,14 +9,14 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewMaxHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewMana);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewMaxMana);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPowerChangedSignature, float, NewPower);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxPowerChangedSignature, float, NewMaxPower);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnduranceChangedSignature, float, NewEndurance);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxEnduranceChangedSignature, float, NewMaxEndurance);
 
-
-
 /**
+ * UOverlayWidgetController
+ *
  * 
  */
 UCLASS(BlueprintType, Blueprintable)
@@ -36,10 +36,10 @@ public:
 	FOnMaxHealthChangedSignature OnMaxHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category= "GAS|Attributes")
-	FOnManaChangedSignature OnManaChanged;
+	FOnPowerChangedSignature OnPowerChanged;
 
 	UPROPERTY(BlueprintAssignable, Category= "GAS|Attributes")
-	FOnMaxManaChangedSignature OnMaxManaChanged;
+	FOnMaxPowerChangedSignature OnMaxPowerChanged;
 
 	UPROPERTY(BlueprintAssignable, Category= "GAS|Attributes")
 	FOnEnduranceChangedSignature OnEnduranceChanged;
@@ -50,8 +50,8 @@ public:
 protected:
 	void HealthChanged(const FOnAttributeChangeData& Data) const;
 	void MaxHealthChanged(const FOnAttributeChangeData& Data) const;
-	void ManaChanged(const FOnAttributeChangeData& Data) const;
-	void MaxManaChanged(const FOnAttributeChangeData& Data) const;
+	void PowerChanged(const FOnAttributeChangeData& Data) const;
+	void MaxPowerChanged(const FOnAttributeChangeData& Data) const;
 	void EnduranceChanged(const FOnAttributeChangeData& Data) const;
 	void MaxEnduranceChanged(const FOnAttributeChangeData& Data) const;
 	

@@ -4,9 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
+#include "AbilitySystem/Attributes/RPGCombatSet.h"
+#include "AbilitySystem/Attributes/RPGHealthSet.h"
 #include "UObject/NoExportTypes.h"
 #include "RPGWidgetController.generated.h"
 
+class URPGCombatSet;
+class URPGAttributeSet;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -16,8 +20,8 @@ struct FWidgetControllerParams
 	GENERATED_BODY()
 
 	FWidgetControllerParams() {}
-	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
-	: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeSet(AS) {}
+	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, URPGHealthSet* HAS, URPGCombatSet* CAS)
+	: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), HealthSet(HAS), CombatSet(CAS) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<APlayerController> PlayerController = nullptr;
@@ -29,7 +33,10 @@ struct FWidgetControllerParams
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
+	TObjectPtr<URPGHealthSet> HealthSet = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<URPGCombatSet> CombatSet = nullptr;
 };
 
 /**
@@ -62,4 +69,12 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category= "WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(BlueprintReadOnly, Category= "WidgetController")
+	TObjectPtr<URPGHealthSet> HealthSet;
+
+	UPROPERTY(BlueprintReadOnly, Category= "WidgetController")
+	TObjectPtr<URPGCombatSet> CombatSet;
+
+	
 };

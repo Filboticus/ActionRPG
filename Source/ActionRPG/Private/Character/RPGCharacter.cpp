@@ -4,7 +4,9 @@
 #include "Character/RPGCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/RPGAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Character/RPGHealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/RPGPlayerControllerBase.h"
@@ -65,13 +67,14 @@ void ARPGCharacter::InitAbilityActorInfo()
 	check(RPGPlayerState);
 	RPGPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(RPGPlayerState, this);
 	AbilitySystemComponent = RPGPlayerState->GetAbilitySystemComponent();
-	AttributeSet = RPGPlayerState->GetAttributeSet();
+	HealthSet = RPGPlayerState->GetHealthSet();
+	CombatSet = RPGPlayerState->GetCombatSet();
 
 	if (ARPGPlayerControllerBase* RPGPlayerControllerBase = Cast<ARPGPlayerControllerBase>(GetController())) //TODO Should I rename RPGPlayerControllerBase to RPGPlayerController?
 	{
 		if (ARPGHUD* RPGHUD = Cast<ARPGHUD>(RPGPlayerControllerBase->GetHUD()))
 		{
-			RPGHUD->InitOverlay(RPGPlayerControllerBase, RPGPlayerState, AbilitySystemComponent, AttributeSet);
+			RPGHUD->InitOverlay(RPGPlayerControllerBase, RPGPlayerState, AbilitySystemComponent, HealthSet, CombatSet);
 		}
 	}
 }

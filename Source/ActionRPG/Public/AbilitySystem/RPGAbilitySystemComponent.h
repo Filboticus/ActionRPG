@@ -7,7 +7,9 @@
 #include "RPGAbilitySystemComponent.generated.h"
 
 /**
- * 
+ * URPGAbilitySystemComponent
+ *
+ *	Base ability system component class used by this project.
  */
 UCLASS()
 class ACTIONRPG_API URPGAbilitySystemComponent : public UAbilitySystemComponent

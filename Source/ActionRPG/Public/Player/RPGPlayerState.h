@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerState.h"
 #include "RPGPlayerState.generated.h"
 
+class URPGCombatSet;
+class URPGHealthSet;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
@@ -22,13 +24,22 @@ public:
 	ARPGPlayerState();
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	UAttributeSet* GetAttributeSet() const;
-
+	
+	URPGHealthSet* GetHealthSet() const;
+	URPGCombatSet* GetCombatSet() const;
 protected:
-	UPROPERTY()
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
+private:
+
+	UPROPERTY(VisibleAnywhere, Category = "RPG|PlayerState")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	// Health attribute set used by this actor.
 	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;
+	TObjectPtr<URPGHealthSet> HealthSet;
+
+	// Combat Attribute set used by this actor.
+	UPROPERTY()
+	TObjectPtr<URPGCombatSet> CombatSet;
+
 };

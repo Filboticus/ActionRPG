@@ -8,7 +8,8 @@ void URPGWidgetController::SetWidgetControllerParams(const FWidgetControllerPara
 	PlayerController = WCParams.PlayerController;
 	PlayerState = WCParams.PlayerState;
 	AbilitySystemComponent = WCParams.AbilitySystemComponent;
-	AttributeSet = WCParams.AttributeSet;
+	HealthSet = WCParams.HealthSet;
+	CombatSet = WCParams.CombatSet;
 }
 
 void URPGWidgetController::BroadcastInitialValues()

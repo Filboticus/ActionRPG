@@ -4,7 +4,7 @@
 #include "Character/RPGEnemy.h"
 
 #include "AbilitySystem/RPGAbilitySystemComponent.h"
-#include "AbilitySystem/RPGAttributeSet.h"
+#include "AbilitySystem/Attributes/RPGAttributeSet.h"
 #include "ActionRPG/ActionRPG.h"
 
 ARPGEnemy::ARPGEnemy()

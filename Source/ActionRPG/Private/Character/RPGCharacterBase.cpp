@@ -3,6 +3,9 @@
 
 #include "Character/RPGCharacterBase.h"
 
+#include "AbilitySystem/RPGAbilitySystemComponent.h"
+#include "Character/RPGHealthComponent.h"
+
 // Sets default values
 ARPGCharacterBase::ARPGCharacterBase()
 {
@@ -15,15 +18,16 @@ ARPGCharacterBase::ARPGCharacterBase()
 	
 }
 
+URPGAbilitySystemComponent* ARPGCharacterBase::GetRPGAbilitySystemComponent() const
+{
+	return Cast<URPGAbilitySystemComponent>(GetAbilitySystemComponent());
+}
+
 UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
 
-UAttributeSet* ARPGCharacterBase::GetAttributeSet() const
-{
-	return AttributeSet;
-}
 
 // Called when the game starts or when spawned
 void ARPGCharacterBase::BeginPlay()

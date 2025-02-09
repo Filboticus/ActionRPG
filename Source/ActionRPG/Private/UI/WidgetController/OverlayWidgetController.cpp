@@ -3,41 +3,46 @@
 
 #include "UI/WidgetController/OverlayWidgetController.h"
 
-#include "AbilitySystem/RPGAttributeSet.h"
+#include "AbilitySystem/Attributes/RPGAttributeSet.h"
+#include "AbilitySystem/Attributes/RPGHealthSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
-	const URPGAttributeSet* RPGAttributeSet = CastChecked<URPGAttributeSet>(AttributeSet);
+	//const URPGAttributeSet* RPGAttributeSet = CastChecked<URPGAttributeSet>(AttributeSet);
+	const URPGHealthSet* RPGHealthSet = CastChecked<URPGHealthSet>(HealthSet);
+	const URPGCombatSet* RPGCombatSet = CastChecked<URPGCombatSet>(CombatSet);
 	
-	OnHealthChanged.Broadcast(RPGAttributeSet->GetHealth());
-	OnMaxHealthChanged.Broadcast(RPGAttributeSet->GetMaxHealth());
-	OnManaChanged.Broadcast(RPGAttributeSet->GetMana());
-	OnMaxManaChanged.Broadcast(RPGAttributeSet->GetMaxMana());
-	OnEnduranceChanged.Broadcast(RPGAttributeSet->GetEndurance());
-	OnMaxEnduranceChanged.Broadcast(RPGAttributeSet->GetMaxEndurance());
+	OnHealthChanged.Broadcast(RPGHealthSet->GetHealth());
+	OnMaxHealthChanged.Broadcast(RPGHealthSet->GetMaxHealth());
+	OnPowerChanged.Broadcast(RPGCombatSet->GetPower());
+	OnMaxPowerChanged.Broadcast(RPGCombatSet->GetMaxPower());
+	OnEnduranceChanged.Broadcast(RPGCombatSet->GetEndurance());
+	OnMaxEnduranceChanged.Broadcast(RPGCombatSet->GetMaxEndurance());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
-	const URPGAttributeSet* RPGAttributeSet = CastChecked<URPGAttributeSet>(AttributeSet);
+	//const URPGAttributeSet* RPGAttributeSet = CastChecked<URPGAttributeSet>(AttributeSet);
+	const URPGHealthSet* RPGHealthSet = CastChecked<URPGHealthSet>(HealthSet);
+	const URPGCombatSet* RPGCombatSet = CastChecked<URPGCombatSet>(CombatSet);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		RPGAttributeSet->GetHealthAttribute()).AddUObject(this, &UOverlayWidgetController::HealthChanged);
+		RPGHealthSet->GetHealthAttribute()).AddUObject(this, &UOverlayWidgetController::HealthChanged);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		RPGAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UOverlayWidgetController::MaxHealthChanged);
+		RPGHealthSet->GetMaxHealthAttribute()).AddUObject(this, &UOverlayWidgetController::MaxHealthChanged);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		RPGAttributeSet->GetManaAttribute()).AddUObject(this, &UOverlayWidgetController::ManaChanged);
+		RPGCombatSet->GetPowerAttribute()).AddUObject(this, &UOverlayWidgetController::PowerChanged);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		RPGAttributeSet->GetMaxManaAttribute()).AddUObject(this, &UOverlayWidgetController::MaxManaChanged);
+		RPGCombatSet->GetMaxPowerAttribute()).AddUObject(this, &UOverlayWidgetController::MaxPowerChanged);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		RPGAttributeSet->GetEnduranceAttribute()).AddUObject(this, &UOverlayWidgetController::EnduranceChanged);
+		RPGCombatSet->GetEnduranceAttribute()).AddUObject(this, &UOverlayWidgetController::EnduranceChanged);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		RPGAttributeSet->GetMaxEnduranceAttribute()).AddUObject(this, &UOverlayWidgetController::MaxEnduranceChanged);
+		RPGCombatSet->GetMaxEnduranceAttribute()).AddUObject(this, &UOverlayWidgetController::MaxEnduranceChanged);
 
 }
 
@@ -51,14 +56,14 @@ void UOverlayWidgetController::MaxHealthChanged(const FOnAttributeChangeData& Da
 	OnMaxHealthChanged.Broadcast(Data.NewValue);
 }
 
-void UOverlayWidgetController::ManaChanged(const FOnAttributeChangeData& Data) const
+void UOverlayWidgetController::PowerChanged(const FOnAttributeChangeData& Data) const
 {
-	OnManaChanged.Broadcast(Data.NewValue);
+	OnPowerChanged.Broadcast(Data.NewValue);
 }
 
-void UOverlayWidgetController::MaxManaChanged(const FOnAttributeChangeData& Data) const
+void UOverlayWidgetController::MaxPowerChanged(const FOnAttributeChangeData& Data) const
 {
-	OnMaxManaChanged.Broadcast(Data.NewValue);
+	OnMaxPowerChanged.Broadcast(Data.NewValue);
 }
 
 void UOverlayWidgetController::EnduranceChanged(const FOnAttributeChangeData& Data) const

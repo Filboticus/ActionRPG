@@ -7,7 +7,9 @@
 #include "RPGUserWidget.generated.h"
 
 /**
- * 
+ * URPGUserWidget
+ *
+ * Base User Widget class for the project 
  */
 UCLASS()
 class ACTIONRPG_API URPGUserWidget : public UUserWidget
@@ -15,6 +17,7 @@ class ACTIONRPG_API URPGUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetController(UObject* InWidgetController);
 	
@@ -22,6 +25,7 @@ public:
 	TObjectPtr<UObject> WidgetController;
 
 protected:
+	
 	UFUNCTION(BlueprintImplementableEvent)
 	void WidgetControllerSet();
 };
