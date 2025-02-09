@@ -14,6 +14,7 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+class URPGAbilitySystemComponent;
 /** 
  * Delegate used to broadcast attribute events, some of these parameters may be null on clients: 
  * @param EffectInstigator	The original instigating actor for this event
@@ -73,16 +74,10 @@ class ACTIONRPG_API URPGAttributeSet : public UAttributeSet
 public:
 	URPGAttributeSet();
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	URPGAbilitySystemComponent* GetRPGAbilitySystemComponent() const;
 
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
-
-protected:
-	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
-
 };

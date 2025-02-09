@@ -6,6 +6,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
+#include "AbilitySystem/RPGAbilitySystemComponent.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
@@ -13,16 +14,9 @@ URPGAttributeSet::URPGAttributeSet()
 {
 }
 
-void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+URPGAbilitySystemComponent* URPGAttributeSet::GetRPGAbilitySystemComponent() const
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}
-
-void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
-{
-	Super::PreAttributeChange(Attribute, NewValue);
-
-	ClampAttribute(Attribute, NewValue);
+	return Cast<URPGAbilitySystemComponent>(GetOwningAbilitySystemComponent());
 }
 
 void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -31,7 +25,6 @@ void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
-	
 }
 
 
@@ -71,25 +64,4 @@ void URPGAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData&
 
 		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
 	}
-}
-
-void URPGAttributeSet::ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const
-{
-	//if (Attribute == GetHealthAttribute())
-	//{
-		// Do not allow health to go negative or above max health.
-	//	NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
-	//}
-
-//	if (Attribute == GetEnduranceAttribute())
-//	{
-//		// Do not allow Endurance to go negative or above max health.
-//		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxEndurance());
-//	}
-	
-//	if (Attribute == GetManaAttribute())
-//	{
-//		// Do not allow Mana to go negative or above max health.
-//		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
-//	}
 }

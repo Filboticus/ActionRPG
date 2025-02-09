@@ -64,5 +64,45 @@ void URPGCombatSet::OnRep_MaxEndurance(const FGameplayAttributeData& OldMaxEndur
 	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGCombatSet, MaxEndurance, OldMaxEndurance);
 }
 
+void URPGCombatSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+
+	ClampAttribute(Attribute, NewValue);
+}
+
+void URPGCombatSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	ClampAttribute(Attribute, NewValue);
+}
+
+void URPGCombatSet::ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const
+{
+	if (Attribute == GetPowerAttribute())
+	{
+		// Do not allow Power to go negative or above Max Power
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxPower());
+	}
+	else if (Attribute == GetMaxPowerAttribute())
+	{
+		// Do not allow Max Power to drop below 0
+		NewValue = FMath::Max(NewValue, 0.0f);
+	}
+
+	if (Attribute == GetEnduranceAttribute())
+	{
+		// Do not allow Endurance to go negative or above Max Endurance
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxEndurance());
+	}
+	else if (Attribute == GetMaxEnduranceAttribute())
+	{
+		// Do not allow Max Endurance to drop below 0
+		NewValue = FMath::Max(NewValue, 0.0f);
+	}
+}
+
+
 
 

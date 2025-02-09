@@ -42,20 +42,25 @@ protected:
 	UFUNCTION()
 	void OnRep_BaseHeal(const FGameplayAttributeData& OldValue);
 
-public:
 	UFUNCTION()
 	void OnRep_Power(const FGameplayAttributeData& OldPower);
 
 	UFUNCTION()
 	void OnRep_MaxPower(const FGameplayAttributeData& OldMaxPower);
 	
-
 	UFUNCTION()
 	void OnRep_Endurance(const FGameplayAttributeData& OldEndurance) const;
 
 	UFUNCTION()
 	void OnRep_MaxEndurance(const FGameplayAttributeData& OldMaxEndurance) const;
+
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 	
+	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
+
+public:
+
 private:
 
 	// The base amount of damage to apply in the damage execution.
