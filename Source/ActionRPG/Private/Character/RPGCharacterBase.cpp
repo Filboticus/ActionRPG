@@ -15,6 +15,10 @@ ARPGCharacterBase::ARPGCharacterBase()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Weapon_Left = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon_Left");
+	Weapon_Left->SetupAttachment(GetMesh(), FName("WeaponHandSocket_Left"));
+	Weapon_Left->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 }
 
