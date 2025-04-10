@@ -73,7 +73,7 @@ class ACTIONRPG_API URPGAttributeSet : public UAttributeSet
 
 public:
 	URPGAttributeSet();
-
+	
 	URPGAbilitySystemComponent* GetRPGAbilitySystemComponent() const;
 
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;

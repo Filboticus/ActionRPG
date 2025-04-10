@@ -19,7 +19,8 @@ ARPGCharacterBase::ARPGCharacterBase()
 	Weapon_Left = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon_Left");
 	Weapon_Left->SetupAttachment(GetMesh(), FName("WeaponHandSocket_Left"));
 	Weapon_Left->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
+
+	HealthComponent = CreateDefaultSubobject<URPGHealthComponent>(TEXT("HealthComponent"));
 }
 
 URPGAbilitySystemComponent* ARPGCharacterBase::GetRPGAbilitySystemComponent() const
@@ -37,6 +38,15 @@ UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 void ARPGCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
+
+void ARPGCharacterBase::AddCharacterAbilities()
+{
+	URPGAbilitySystemComponent* RPG_ASC = CastChecked<URPGAbilitySystemComponent>(AbilitySystemComponent);
+	if (!HasAuthority()) return;
+
+	RPG_ASC->AddCharacterAbilities(StartupAbilities);
 	
 }
 

@@ -60,6 +60,54 @@ void URPGHealthComponent::InitializeWithAbilitySystem(URPGAbilitySystemComponent
 	OnMaxHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
 }
 
+void URPGHealthComponent::UninitializeFromAbilitySystem()
+{
+	ClearGameplayTags();
+
+	if (HealthSet)
+	{
+		HealthSet->OnHealthChanged.RemoveAll(this);
+		HealthSet->OnMaxHealthChanged.RemoveAll(this);
+		HealthSet->OnOutOfHealth.RemoveAll(this);
+	}
+
+	HealthSet = nullptr;
+	AbilitySystemComponent = nullptr;
+}
+
+float URPGHealthComponent::GetHealth() const
+{
+	return (HealthSet ? HealthSet->GetHealth() : 0.0f);
+}
+
+float URPGHealthComponent::GetMaxHealth() const
+{
+	return (HealthSet ? HealthSet->GetMaxHealth() : 0.0f);
+}
+
+float URPGHealthComponent::GetHealthNormalized() const
+{
+	if (HealthSet)
+	{
+		const float Health = HealthSet->GetHealth();
+		const float MaxHealth = HealthSet->GetMaxHealth();
+
+		return ((MaxHealth > 0.0f) ? (Health / MaxHealth) : 0.0f);
+	}
+
+	return 0.0f;
+}
+
+void URPGHealthComponent::ClearGameplayTags()
+{
+	if (AbilitySystemComponent)
+	{
+		//TODO: RPGGameplayTags 
+		//AbilitySystemComponent->SetLooseGameplayTagCount(LyraGameplayTags::Status_Death_Dying, 0);
+		//AbilitySystemComponent->SetLooseGameplayTagCount(LyraGameplayTags::Status_Death_Dead, 0);
+	}
+}
+
 void URPGHealthComponent::HandleHealthChanged(AActor* DamageInstigator, AActor* DamageCauser,
                                               const FGameplayEffectSpec* DamageEffectSpec, float DamageMagnitude, float OldValue, float NewValue)
 {

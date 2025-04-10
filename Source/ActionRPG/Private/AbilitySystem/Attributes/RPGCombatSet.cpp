@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/Attributes/RPGCombatSet.h"
 
+#include "AbilitySystem/RPGAbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/RPGAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 

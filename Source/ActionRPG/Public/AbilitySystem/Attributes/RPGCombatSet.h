@@ -59,6 +59,8 @@ protected:
 	
 	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
 
+	void CancelEnduranceRegen();
+
 public:
 
 private:

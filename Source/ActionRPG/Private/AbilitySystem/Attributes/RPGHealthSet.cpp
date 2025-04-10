@@ -113,6 +113,7 @@ void URPGHealthSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, 
 	Super::PreAttributeBaseChange(Attribute, NewValue);
 
 	ClampAttribute(Attribute, NewValue);
+	
 }
 
 void URPGHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

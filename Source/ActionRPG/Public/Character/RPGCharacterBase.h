@@ -10,6 +10,7 @@
 class URPGCombatSet;
 class URPGHealthSet;
 class URPGHealthComponent;
+class UGameplayAbility;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
@@ -57,5 +58,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URPGCombatSet> CombatSet;
 
+protected:
+
+	void AddCharacterAbilities();
 	
+private:
+	
+	UPROPERTY(EditAnywhere, Category= "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

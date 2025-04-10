@@ -31,12 +31,32 @@ public:
 	// Sets default values for this component's properties
 	URPGHealthComponent(const FObjectInitializer& ObjectInitializer);
 
+	// Returns the health component if one exists on the specific actor.
+	UFUNCTION(BlueprintPure, Category = "RPG|Health")
+	static URPGHealthComponent* FindHealthComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<URPGHealthComponent>() : nullptr); }
+	
 	// Initialize the component using an ability system component.
 	UFUNCTION(BlueprintCallable, Category = "RPG|Health")
 	void InitializeWithAbilitySystem(URPGAbilitySystemComponent* InASC);
 
+	// Uninitialize the component, clearing any reference to the ability system.
+	UFUNCTION(BlueprintCallable, Category = "RPG|Health")
+	void UninitializeFromAbilitySystem();
+	
+	// Returns the current health value.
+	UFUNCTION(BlueprintCallable, Category = "RPG|Health")
+	float GetHealth() const;
+
+	// Returns the current maximum health value.
+	UFUNCTION(BlueprintCallable, Category = "RPG|Health")
+	float GetMaxHealth() const;
+
+	// Returns the current health in the range [0.0, 1.0].
+	UFUNCTION(BlueprintCallable, Category = "RPG|Health")
+	float GetHealthNormalized() const;
+
 public:
-	// Delegate fired when the health value has changed. This is called on the client but the instigator may not be valid
+	// Delegate fired when the health  value has changed. This is called on the client but the instigator may not be valid
 	UPROPERTY(BlueprintAssignable)
 	FRPGHealth_AttributeChanged OnHealthChanged;
 
@@ -45,6 +65,8 @@ public:
 	FRPGHealth_AttributeChanged OnMaxHealthChanged;
 
 protected:
+
+	void ClearGameplayTags();
 	
 	virtual void HandleHealthChanged(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec* DamageEffectSpec, float DamageMagnitude, float OldValue, float NewValue);
 	virtual void HandleMaxHealthChanged(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec* DamageEffectSpec, float DamageMagnitude, float OldValue, float NewValue);
@@ -58,5 +80,7 @@ protected:
 	// Health set used by this component.
 	UPROPERTY()
 	TObjectPtr<const URPGHealthSet> HealthSet;
+
+	
 	
 };
