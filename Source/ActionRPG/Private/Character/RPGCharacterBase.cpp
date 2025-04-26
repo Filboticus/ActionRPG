@@ -3,6 +3,9 @@
 
 #include "Character/RPGCharacterBase.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayEffect.h"
+
 #include "AbilitySystem/RPGAbilitySystemComponent.h"
 #include "Character/RPGHealthComponent.h"
 
@@ -38,7 +41,58 @@ UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 void ARPGCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ApplyHealthRegenToSelf(HealthRegenGameplayEffectClass);
+	ApplyPowerRegenToSelf(PowerRegenGameplayEffectClass);
+	ApplyEnduranceRegenToSelf(EnduranceRegenGameplayEffectClass);
+}
+
+void ARPGCharacterBase::ApplyHealthRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (!ASC || !GameplayEffectClass)
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+
+	const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(GameplayEffectClass, 1.0f, EffectContextHandle);
+
+	ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+}
+
+void ARPGCharacterBase::ApplyPowerRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (!ASC || !GameplayEffectClass)
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+
+	const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(GameplayEffectClass, 1.0f, EffectContextHandle);
+
+	ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+}
+
+void ARPGCharacterBase::ApplyEnduranceRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (!ASC || !GameplayEffectClass)
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+
+	const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(GameplayEffectClass, 1.0f, EffectContextHandle);
+
+	ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 }
 
 void ARPGCharacterBase::AddCharacterAbilities()
@@ -47,6 +101,5 @@ void ARPGCharacterBase::AddCharacterAbilities()
 	if (!HasAuthority()) return;
 
 	RPG_ASC->AddCharacterAbilities(StartupAbilities);
-	
 }
 

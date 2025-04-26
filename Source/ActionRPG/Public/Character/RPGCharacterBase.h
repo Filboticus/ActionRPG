@@ -5,17 +5,19 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 #include "RPGCharacterBase.generated.h"
 
 class URPGCombatSet;
 class URPGHealthSet;
 class URPGHealthComponent;
 class UGameplayAbility;
+class UGameplayEffect;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
 UCLASS(Abstract) 
-class ACTIONRPG_API ARPGCharacterBase : public ACharacter, public IAbilitySystemInterface
+class ACTIONRPG_API ARPGCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -57,6 +59,24 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<URPGCombatSet> CombatSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects | Regeneration")
+	TSubclassOf<UGameplayEffect> HealthRegenGameplayEffectClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects | Regeneration")
+	TSubclassOf<UGameplayEffect> PowerRegenGameplayEffectClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects | Regeneration")
+	TSubclassOf<UGameplayEffect> EnduranceRegenGameplayEffectClass;
+	
+	UFUNCTION()
+	void ApplyHealthRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass);
+
+	UFUNCTION()
+	void ApplyPowerRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass);
+
+	UFUNCTION()
+	void ApplyEnduranceRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass);
 
 protected:
 

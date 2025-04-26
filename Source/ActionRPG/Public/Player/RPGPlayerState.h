@@ -23,11 +23,12 @@ class ACTIONRPG_API ARPGPlayerState : public APlayerState, public IAbilitySystem
 public:
 	ARPGPlayerState();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	URPGHealthSet* GetHealthSet() const;
 	URPGCombatSet* GetCombatSet() const;
-protected:
 
 private:
 
@@ -41,5 +42,11 @@ private:
 	// Combat Attribute set used by this actor.
 	UPROPERTY()
 	TObjectPtr<URPGCombatSet> CombatSet;
+	
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_Level)
+	int32 Level = 1;
+	
+	UFUNCTION()
+	void OnRep_Level(int32 OldLevel);
 
 };

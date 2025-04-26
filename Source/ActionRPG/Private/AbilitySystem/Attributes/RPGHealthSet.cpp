@@ -12,6 +12,7 @@ URPGHealthSet::URPGHealthSet()
 	, MaxHealth(100.0f)
 {
 	bOutOfHealth = false;
+	bFullHealth = false;
 	MaxHealthBeforeAttributeChange = 0.0f;
 	HealthBeforeAttributeChange = 0.0f;
 }
@@ -33,6 +34,7 @@ void URPGHealthSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 	// These events on the client should not be changing attributes
 
 	const float CurrentHealth = GetHealth();
+	const float CurrentMaxHealth = GetMaxHealth();
 	const float EstimatedMagnitude = CurrentHealth - OldValue.GetCurrentValue();
 
 	OnHealthChanged.Broadcast(nullptr, nullptr, nullptr, EstimatedMagnitude, OldValue.GetCurrentValue(), CurrentHealth);
@@ -43,6 +45,9 @@ void URPGHealthSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 	}
 
 	bOutOfHealth = (CurrentHealth <= 0.0f);
+	bFullHealth = (CurrentHealth <= CurrentMaxHealth); 
+
+	UE_LOG(LogTemp, Warning, TEXT("bFullHealth value is %s"), ( bFullHealth ? TEXT("true") : TEXT("false") ));
 }
 
 void URPGHealthSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
@@ -142,6 +147,13 @@ void URPGHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, flo
 	if (bOutOfHealth && (GetHealth() > 0.0f))
 	{
 		bOutOfHealth = false;
+	}
+
+	if (!bFullHealth && (GetHealth() >= GetMaxHealth()))
+	{
+		bFullHealth = true;
+
+		UE_LOG(LogTemp, Warning, TEXT("bFullHealth value is %s"), ( bFullHealth ? TEXT("true") : TEXT("false") ));
 	}
 }
 

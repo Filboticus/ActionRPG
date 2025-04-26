@@ -18,15 +18,24 @@ class ACTIONRPG_API ARPGEnemy : public ARPGCharacterBase, public IEnemyInterface
 public:
 	ARPGEnemy();
 	
-	//~  Begin Enemy Interface. 
+	/**  Begin Enemy Interface */
 	virtual void HighlightActor() override;
 	
 	virtual void UnHighlightActor() override;
-	//~  End Enemy Interface.
+	
+	/**  End Enemy Interface */
+
+	//** Combat Interface */
+	virtual int32 GetLevel() override;
+	
+	/** End Combat Interface */
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlighted = false;
 
 protected:
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Character Class Defaults")
+	int32 Level = 1;
 };

@@ -7,6 +7,7 @@
 #include "AbilitySystem/Attributes/RPGAttributeSet.h"
 #include "AbilitySystem/Attributes/RPGCombatSet.h"
 #include "AbilitySystem/Attributes/RPGHealthSet.h"
+#include "Net/UnrealNetwork.h"
 
 ARPGPlayerState::ARPGPlayerState()
 {
@@ -22,6 +23,13 @@ ARPGPlayerState::ARPGPlayerState()
 	NetUpdateFrequency = 100.f; //How often the server tries to update the clients
 }
 
+void ARPGPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARPGPlayerState, Level);
+}
+
 UAbilitySystemComponent* ARPGPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -35,4 +43,9 @@ URPGHealthSet* ARPGPlayerState::GetHealthSet() const
 URPGCombatSet* ARPGPlayerState::GetCombatSet() const
 {
 	return CombatSet;
+}
+
+void ARPGPlayerState::OnRep_Level(int32 OldLevel)
+{
+	
 }
