@@ -4,31 +4,49 @@
 
 #include "CoreMinimal.h"
 #include "Components/GameFrameworkComponent.h"
+#include "AbilitySystem/RPGAbilitySystemComponent.h"
+#include "AbilitySystem/Attributes/RPGAttributeSet.h"
 
 #include "RPGHealthComponent.generated.h"
 
+class UGameplayEffect;
 class URPGHealthComponent;
-
-class URPGAbilitySystemComponent;
+class UAttributeSet;
+//class URPGAbilitySystemComponent;
 class URPGHealthSet;
+
 struct FFrame;
 struct FGameplayEffectSpec;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRPGHealth_DeathEvent, AActor*, OwningActor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRPGHealth_AttributeChanged, URPGHealthComponent*, HealthComponent, float, OldValue, float, NewValue, AActor*, Instigator);
+
+/**
+ * ERPGDeathState
+ *
+ *	Defines current state of death.
+ */
+UENUM(BlueprintType)
+enum class ERPGDeathState : uint8
+{
+	NotDead = 0,
+	DeathStarted,
+	DeathFinished
+};
 
 /**
  * URPGHealthComponent
  *
  *	An actor component used to handle anything related to health.
  */
+
 UCLASS(Blueprintable, meta=(BlueprintSpawnableComponent))
 class ACTIONRPG_API URPGHealthComponent : public UGameFrameworkComponent
 {
 	GENERATED_BODY()
 
 public:
-
-	// Sets default values for this component's properties
+	
 	URPGHealthComponent(const FObjectInitializer& ObjectInitializer);
 
 	// Returns the health component if one exists on the specific actor.
@@ -55,6 +73,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "RPG|Health")
 	float GetHealthNormalized() const;
 
+	ERPGDeathState GetDeathState() const { return DeathState;}
+
+	// Begins the death sequence for the owner.
+	virtual void StartDeath();
+
+	// Ends the death sequence for the owner.
+	virtual void FinishDeath();
+
 public:
 	// Delegate fired when the health  value has changed. This is called on the client but the instigator may not be valid
 	UPROPERTY(BlueprintAssignable)
@@ -64,12 +90,27 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FRPGHealth_AttributeChanged OnMaxHealthChanged;
 
+	// Delegate fired when the death sequence has started.
+	UPROPERTY(BlueprintAssignable)
+	FRPGHealth_DeathEvent OnDeathStarted;
+
+	// Delegate fired when the death sequence has finished.
+	UPROPERTY(BlueprintAssignable)
+	FRPGHealth_DeathEvent OnDeathFinished;
+
 protected:
 
 	void ClearGameplayTags();
 	
 	virtual void HandleHealthChanged(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec* DamageEffectSpec, float DamageMagnitude, float OldValue, float NewValue);
 	virtual void HandleMaxHealthChanged(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec* DamageEffectSpec, float DamageMagnitude, float OldValue, float NewValue);
+	virtual void HandleOutOfHealth(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec* DamageEffectSpec, float DamageMagnitude, float OldValue, float NewValue);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health Component | Regeneration Gameplay Effects")
+	TSubclassOf<UGameplayEffect> HealthRegenGameplayEffectClass;
+
+	UFUNCTION()
+	virtual void OnRep_DeathState(ERPGDeathState OldDeathState);
 	
 protected:
 
@@ -81,6 +122,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<const URPGHealthSet> HealthSet;
 
-	
-	
+	// Replicated state used to handle dying.
+	UPROPERTY(ReplicatedUsing = OnRep_DeathState)
+	ERPGDeathState DeathState;
 };

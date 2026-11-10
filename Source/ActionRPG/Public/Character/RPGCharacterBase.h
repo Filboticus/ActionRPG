@@ -30,14 +30,23 @@ public:
 	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
+	
+	/*** Combat Interface ***/
+	virtual void Die() override;
+	/*** end Combat Interface ***/
 
 private:
-
+	UPROPERTY(EditAnywhere, Category= "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartUpAbilities;
 	
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	bool bDead = false;
 
 	UPROPERTY(EditAnywhere, Category= "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
@@ -78,12 +87,6 @@ protected:
 	UFUNCTION()
 	void ApplyEnduranceRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass);
 
-protected:
-
+	UFUNCTION()
 	void AddCharacterAbilities();
-	
-private:
-	
-	UPROPERTY(EditAnywhere, Category= "Abilities")
-	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

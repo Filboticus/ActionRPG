@@ -6,6 +6,8 @@
 #include "GameplayEffectExecutionCalculation.h"
 #include "RPGDamageExecution.generated.h"
 
+class UObject;
+
 /**
  * URPGDamageExecution
  *

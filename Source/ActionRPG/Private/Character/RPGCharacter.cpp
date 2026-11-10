@@ -50,7 +50,9 @@ void ARPGCharacter::PossessedBy(AController* NewController)
 
 	// Init Ability Actor Info for the Server
 	InitAbilityActorInfo();
-	
+
+	// Add Startup Gameplay Abilities
+	AddCharacterAbilities();
 }
 
 void ARPGCharacter::OnRep_PlayerState()
@@ -59,6 +61,26 @@ void ARPGCharacter::OnRep_PlayerState()
 
 	// Init Ability Actor Info for the Client
 	InitAbilityActorInfo();
+}
+
+void ARPGCharacter::OnAbilitySystemInitialized()
+{
+	URPGAbilitySystemComponent* LyraASC = GetRPGAbilitySystemComponent();
+	check(LyraASC);
+
+	HealthComponent->InitializeWithAbilitySystem(LyraASC);
+
+	InitializeGameplayTags();
+}
+
+void ARPGCharacter::OnAbilitySystemUninitialized()
+{
+	HealthComponent->UninitializeFromAbilitySystem();
+}
+
+void ARPGCharacter::InitializeGameplayTags()
+{
+	//TODO Setup RPGGameplayTags
 }
 
 void ARPGCharacter::InitAbilityActorInfo()

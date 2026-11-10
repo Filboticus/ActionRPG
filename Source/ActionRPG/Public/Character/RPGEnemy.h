@@ -26,7 +26,7 @@ public:
 	/**  End Enemy Interface */
 
 	//** Combat Interface */
-	virtual int32 GetLevel() override;
+	virtual int32 GetPlayerLevel() override;
 	
 	/** End Combat Interface */
 	

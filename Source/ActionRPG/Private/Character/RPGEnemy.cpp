@@ -52,7 +52,7 @@ void ARPGEnemy::UnHighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
-int32 ARPGEnemy::GetLevel()
+int32 ARPGEnemy::GetPlayerLevel()
 {
 	return Level;
 }

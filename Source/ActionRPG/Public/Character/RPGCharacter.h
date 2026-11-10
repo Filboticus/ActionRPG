@@ -24,6 +24,13 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 protected:
+
+	virtual void OnAbilitySystemInitialized();
+	virtual void OnAbilitySystemUninitialized();
+	
+	void InitializeGameplayTags();
+
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category= "Camera")
 	USpringArmComponent* SpringArmComponent;
 

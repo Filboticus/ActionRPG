@@ -8,6 +8,7 @@
 
 #include "AbilitySystem/RPGAbilitySystemComponent.h"
 #include "Character/RPGHealthComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ARPGCharacterBase::ARPGCharacterBase()
@@ -36,15 +37,46 @@ UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void ARPGCharacterBase::MulticastHandleDeath_Implementation()
+{
+	Weapon->SetSimulatePhysics(true);
+	Weapon->SetEnableGravity(true);
+	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	Weapon_Left->SetSimulatePhysics(true);
+	Weapon_Left->SetEnableGravity(true);
+	Weapon_Left->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Set bDead to true
+	bDead = true;
+}
+
+void ARPGCharacterBase::Die()
+{
+	// Detach Weapons
+	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	Weapon_Left->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+
+	
+}
+
 
 // Called when the game starts or when spawned
 void ARPGCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ApplyHealthRegenToSelf(HealthRegenGameplayEffectClass);
-	ApplyPowerRegenToSelf(PowerRegenGameplayEffectClass);
-	ApplyEnduranceRegenToSelf(EnduranceRegenGameplayEffectClass);
+	//TODO: Turn into Gameplay Abilities
+	//ApplyHealthRegenToSelf(HealthRegenGameplayEffectClass);
+	//ApplyPowerRegenToSelf(PowerRegenGameplayEffectClass);
+	//ApplyEnduranceRegenToSelf(EnduranceRegenGameplayEffectClass);
 }
 
 void ARPGCharacterBase::ApplyHealthRegenToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass)
@@ -98,8 +130,9 @@ void ARPGCharacterBase::ApplyEnduranceRegenToSelf(TSubclassOf<UGameplayEffect> G
 void ARPGCharacterBase::AddCharacterAbilities()
 {
 	URPGAbilitySystemComponent* RPG_ASC = CastChecked<URPGAbilitySystemComponent>(AbilitySystemComponent);
-	if (!HasAuthority()) return;
 
-	RPG_ASC->AddCharacterAbilities(StartupAbilities);
+	if (!HasAuthority()) return;
+	
+	RPG_ASC->AddCharacterAbilities(StartUpAbilities);
 }
 

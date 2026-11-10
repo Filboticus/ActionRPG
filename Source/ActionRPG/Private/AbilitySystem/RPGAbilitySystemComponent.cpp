@@ -7,6 +7,7 @@ void URPGAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<
 {
 	for (TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
 	{
+		//TODO: LEVEL
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		//GiveAbility(AbilitySpec);
 		GiveAbilityAndActivateOnce(AbilitySpec);

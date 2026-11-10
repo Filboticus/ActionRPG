@@ -7,12 +7,13 @@
 #include "AbilitySystem/RPGAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 
+
+
 URPGHealthSet::URPGHealthSet()
 	: Health(10.0f)
 	, MaxHealth(100.0f)
 {
 	bOutOfHealth = false;
-	bFullHealth = false;
 	MaxHealthBeforeAttributeChange = 0.0f;
 	HealthBeforeAttributeChange = 0.0f;
 }
@@ -45,9 +46,6 @@ void URPGHealthSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 	}
 
 	bOutOfHealth = (CurrentHealth <= 0.0f);
-	bFullHealth = (CurrentHealth <= CurrentMaxHealth); 
-
-	UE_LOG(LogTemp, Warning, TEXT("bFullHealth value is %s"), ( bFullHealth ? TEXT("true") : TEXT("false") ));
 }
 
 void URPGHealthSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
@@ -95,6 +93,11 @@ void URPGHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDa
 		SetHealth(FMath::Clamp(GetHealth() + GetHealing(), MinimumHealth, GetMaxHealth()));
 		SetHealing(0.0f);
 	}
+	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		// Clamp and fall into out of health handling below
+		SetHealth(FMath::Clamp(GetHealth(), MinimumHealth, GetMaxHealth()));
+	}
 	else if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
 	{
 		// TODO clamp current health?
@@ -107,6 +110,11 @@ void URPGHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDa
 	if (GetHealth() != HealthBeforeAttributeChange)
 	{
 		OnHealthChanged.Broadcast(Instigator, Causer, &Data.EffectSpec, Data.EvaluatedData.Magnitude, HealthBeforeAttributeChange, GetHealth());
+	}
+
+	if ((GetHealth() <= 0.0f) && !bOutOfHealth)
+	{
+	OnOutOfHealth.Broadcast(Instigator, Causer, &Data.EffectSpec, Data.EvaluatedData.Magnitude, HealthBeforeAttributeChange, GetHealth());
 	}
 
 	// Check health again in case an event above changed it
@@ -147,13 +155,6 @@ void URPGHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, flo
 	if (bOutOfHealth && (GetHealth() > 0.0f))
 	{
 		bOutOfHealth = false;
-	}
-
-	if (!bFullHealth && (GetHealth() >= GetMaxHealth()))
-	{
-		bFullHealth = true;
-
-		UE_LOG(LogTemp, Warning, TEXT("bFullHealth value is %s"), ( bFullHealth ? TEXT("true") : TEXT("false") ));
 	}
 }
 

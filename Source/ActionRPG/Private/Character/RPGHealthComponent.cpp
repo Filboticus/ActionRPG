@@ -3,8 +3,11 @@
 
 #include "Character/RPGHealthComponent.h"
 
+#include "Net/UnrealNetwork.h"
 #include "AbilitySystem/RPGAbilitySystemComponent.h"
+#include "AbilitySystem/Attributes/RPGAttributeSet.h"
 #include "AbilitySystem/Attributes/RPGHealthSet.h"
+#include "Interaction/CombatInterface.h"
 
 
 // Sets default values for this component's properties
@@ -20,8 +23,14 @@ URPGHealthComponent::URPGHealthComponent(const FObjectInitializer& ObjectInitial
 
 	AbilitySystemComponent = nullptr;
 	HealthSet = nullptr;
+	DeathState = ERPGDeathState::NotDead;
+}
 
-	// ...
+void URPGHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(URPGHealthComponent, DeathState);
 }
 
 void URPGHealthComponent::InitializeWithAbilitySystem(URPGAbilitySystemComponent* InASC)
@@ -52,12 +61,15 @@ void URPGHealthComponent::InitializeWithAbilitySystem(URPGAbilitySystemComponent
 	// Register to listen for attribute changes.
 	HealthSet->OnHealthChanged.AddUObject(this, &ThisClass::HandleHealthChanged);
 	HealthSet->OnMaxHealthChanged.AddUObject(this, &ThisClass::HandleMaxHealthChanged);
+	HealthSet->OnOutOfHealth.AddUObject(this, &ThisClass::HandleOutOfHealth);
 
 	// TEMP: Reset attributes to default values. Eventually this will be driven by a spreadsheet.
 	AbilitySystemComponent->SetNumericAttributeBase(URPGHealthSet::GetHealthAttribute(), HealthSet->GetMaxHealth());
+	
+	ClearGameplayTags();
 
 	OnHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
-	OnMaxHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
+	OnMaxHealthChanged.Broadcast(this, HealthSet->GetMaxHealth(), HealthSet->GetMaxHealth(), nullptr);
 }
 
 void URPGHealthComponent::UninitializeFromAbilitySystem()
@@ -91,11 +103,58 @@ float URPGHealthComponent::GetHealthNormalized() const
 	{
 		const float Health = HealthSet->GetHealth();
 		const float MaxHealth = HealthSet->GetMaxHealth();
-
+		
 		return ((MaxHealth > 0.0f) ? (Health / MaxHealth) : 0.0f);
 	}
 
 	return 0.0f;
+}
+
+void URPGHealthComponent::StartDeath()
+{
+	if (DeathState != ERPGDeathState::NotDead)
+	{
+		return;
+	}
+
+	DeathState = ERPGDeathState::DeathStarted;
+
+	if (AbilitySystemComponent)
+	{
+		//todo: Create RPGGameplayTags class
+		//AbilitySystemComponent->SetLooseGameplayTagCount(RPGGameplayTags::Status_Death_Dying, 1);
+	}
+
+	AActor* Owner = GetOwner();
+	check(Owner);
+
+	OnDeathStarted.Broadcast(Owner);
+
+	Owner->ForceNetUpdate();
+}
+
+void URPGHealthComponent::FinishDeath()
+{
+	if (DeathState != ERPGDeathState::DeathStarted)
+	{
+		return;
+	}
+
+	DeathState = ERPGDeathState::DeathFinished;
+
+	if (AbilitySystemComponent)
+	{
+		//todo: Create RPGGameplayTags class
+		//AbilitySystemComponent->SetLooseGameplayTagCount(RPGGameplayTags::Status_Death_Dead, 1);
+	}
+
+	AActor* Owner = GetOwner();
+	check(Owner);
+
+	OnDeathFinished.Broadcast(Owner);
+
+	Owner->ForceNetUpdate();
+	
 }
 
 void URPGHealthComponent::ClearGameplayTags()
@@ -120,3 +179,70 @@ void URPGHealthComponent::HandleMaxHealthChanged(AActor* DamageInstigator, AActo
 	OnMaxHealthChanged.Broadcast(this, OldValue, NewValue, DamageInstigator);
 }
 
+void URPGHealthComponent::HandleOutOfHealth(AActor* DamageInstigator, AActor* DamageCauser,
+	const FGameplayEffectSpec* DamageEffectSpec, float DamageMagnitude, float OldValue, float NewValue)
+{
+#if WITH_SERVER_CODE
+	
+	if (AbilitySystemComponent && DamageEffectSpec)
+	{
+		AActor* Target = AbilitySystemComponent->GetAvatarActor();
+		
+		ICombatInterface* CombatInterface = Cast<ICombatInterface>(Target);
+		{
+			if (CombatInterface)
+			{
+				CombatInterface->Die();
+			}
+		}
+		UE_LOG(LogTemp, Warning, TEXT("HandleOutofHealth -> Death"))
+	}
+
+#endif // #if WITH_SERVER_CODE	
+}
+
+void URPGHealthComponent::OnRep_DeathState(ERPGDeathState OldDeathState)
+{
+	const ERPGDeathState NewDeathState = DeathState;
+
+	// Revert the death state for now since we rely on StartDeath and FinishDeath to change it.
+	DeathState = OldDeathState;
+
+	if (OldDeathState > NewDeathState)
+	{
+		// The server is trying to set us back but we've already predicted past the server state. //todo: LogRPG (Replace LogLrya
+		UE_LOG(LogTemp, Warning, TEXT("RPGHealthComponent: Predicted past server death state [%d] -> [%d] for owner [%s]."), (uint8)OldDeathState, (uint8)NewDeathState, *GetNameSafe(GetOwner()));
+		return;
+	}
+
+	if (OldDeathState == ERPGDeathState::NotDead)
+	{
+		if (NewDeathState == ERPGDeathState::DeathStarted)
+		{
+			StartDeath();
+		}
+		else if (NewDeathState == ERPGDeathState::DeathFinished)
+		{
+			StartDeath();
+			FinishDeath();
+		}
+		else
+		{
+			//todo: LogRPG (Replace LogLrya
+			UE_LOG(LogTemp, Error, TEXT("RPGHealthComponent: Invalid death transition [%d] -> [%d] for owner [%s]."), (uint8)OldDeathState, (uint8)NewDeathState, *GetNameSafe(GetOwner()));
+		}
+	}
+	else if (OldDeathState == ERPGDeathState::DeathStarted)
+	{
+		if (NewDeathState == ERPGDeathState::DeathFinished)
+		{
+			FinishDeath();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("RPGHealthComponent: Invalid death transition [%d] -> [%d] for owner [%s]."), (uint8)OldDeathState, (uint8)NewDeathState, *GetNameSafe(GetOwner()));
+		}
+	}
+	
+	ensureMsgf((DeathState == NewDeathState), TEXT("LyraHealthComponent: Death transition failed [%d] -> [%d] for owner [%s]."), (uint8)OldDeathState, (uint8)NewDeathState, *GetNameSafe(GetOwner()));
+}

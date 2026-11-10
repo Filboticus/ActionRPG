@@ -35,6 +35,8 @@ public:
 	// Delegate to broadcast when the health attribute reaches zero
 	mutable FRPGAttributeEvent OnOutOfHealth;
 
+	mutable FRPGAttributeEvent OnOutOfHealth_Death; 
+
 	// Delegate to broadcast when the health attribute reaches max health attribute
 	mutable FRPGAttributeEvent OnFullHealth;
 
@@ -65,10 +67,7 @@ private:
 
 	// Used to track when the health reaches 0.
 	bool bOutOfHealth;
-
-	// Used to track when health reaches max health.
-	bool bFullHealth;
-
+	
 	// Store the health before any changes 
 	float MaxHealthBeforeAttributeChange;
 	float HealthBeforeAttributeChange;
